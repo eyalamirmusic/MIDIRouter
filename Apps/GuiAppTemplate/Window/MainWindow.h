@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Source/CommonHeader.h"
+#include <juce_audio_utils/juce_audio_utils.h>
 
 namespace GuiApp
 {
