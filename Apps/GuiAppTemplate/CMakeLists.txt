@@ -3,7 +3,6 @@ project(GuiAppTemplate VERSION 0.0.1)
 set (TargetName ${PROJECT_NAME})
 
 juce_add_gui_app(${TargetName} PRODUCT_NAME "Gui App Example")
-juce_generate_juce_header(${TargetName})
 
 set(source_files
         Window/Main.cpp
@@ -26,7 +25,7 @@ target_compile_definitions(${TargetName} PRIVATE
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:${TargetName},JUCE_VERSION>")
 
 target_link_libraries(${TargetName} PRIVATE
-        juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags
-        juce::juce_gui_extra)
+        juce_recommended_config_flags
+        juce_recommended_lto_flags
+        juce_recommended_warning_flags
+        juce_gui_extra)
