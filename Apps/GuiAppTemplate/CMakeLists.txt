@@ -1,16 +1,13 @@
-project(GuiAppTemplate VERSION 0.0.1)
+project(MIDIRouter VERSION 0.0.1)
 
 set (TargetName ${PROJECT_NAME})
 
-juce_add_gui_app(${TargetName} PRODUCT_NAME "Gui App Example")
+juce_add_gui_app(${TargetName} PRODUCT_NAME "MIDI Router")
 
 set(source_files
         Window/Main.cpp
-        Window/MainWindow.cpp
-        Window/MainWindow.h
 
         Source/CommonHeader.h
-        Source/HelloWorldLabel.h
         Source/MainComponent.h
         Source/MainComponent.cpp)
 
@@ -24,9 +21,13 @@ target_compile_definitions(${TargetName} PRIVATE
         JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:${TargetName},JUCE_PROJECT_NAME>"
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:${TargetName},JUCE_VERSION>")
 
+juce_add_binary_data(MIDIRouterResources SOURCES
+        Resources/Logo.png)
+
 target_link_libraries(${TargetName} PRIVATE
         juce_recommended_config_flags
         juce_recommended_lto_flags
         juce_recommended_warning_flags
         juce_gui_extra
-        juce_audio_utils)
+        juce_audio_utils
+        MIDIRouterResources)

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "HelloWorldLabel.h"
-#include <juce_audio_utils/juce_audio_utils.h>
+#include "CommonHeader.h"
 
 template <typename T>
 using OwnedVector = std::vector<std::unique_ptr<T>>;
@@ -12,6 +11,37 @@ using juce::MidiDeviceInfo;
 
 struct ConnectionDescription
 {
+    void connect(const MidiDeviceInfo& info)
+    {
+        if (!hasOutput(info))
+            outputs.emplace_back(info);
+    }
+
+    void toggle(const MidiDeviceInfo& info)
+    {
+        if (hasOutput(info))
+            disconnect(info);
+        else
+            connect(info);
+    }
+
+    void disconnect(const MidiDeviceInfo& info)
+    {
+        auto removed = std::ranges::remove(outputs, info).begin();
+        outputs.erase(removed);
+    }
+
+    bool hasOutput(const MidiDeviceInfo& info) const
+    {
+        for (auto& output: outputs)
+        {
+            if (info == output)
+                return true;
+        }
+
+        return false;
+    }
+
     MidiDeviceInfo input;
     std::vector<MidiDeviceInfo> outputs;
 };
@@ -70,16 +100,16 @@ inline std::unique_ptr<LiveConnection>
         }
     }
 
-    auto outputDevices = juce::MidiInput::getAvailableDevices();
+    auto outputDevices = juce::MidiOutput::getAvailableDevices();
 
     for (auto output: description.outputs)
     {
         for (auto& device: outputDevices)
         {
-            if (device.identifier == description.input.identifier)
+            if (device.identifier == output.identifier)
             {
                 newConnection->outputs.emplace_back(
-                    juce::MidiOutput::openDevice(description.input.identifier));
+                    juce::MidiOutput::openDevice(output.identifier));
             }
         }
     }
@@ -95,6 +125,26 @@ inline std::unique_ptr<LiveConnection>
 
 struct State
 {
+    void createConnection(const MidiDeviceInfo& inputID)
+    {
+        if (!hasConnection(inputID))
+        {
+            connections.emplace_back();
+            connections.back().input = inputID;
+        }
+    }
+
+    bool hasConnection(const MidiDeviceInfo& inputID) const
+    {
+        for (auto& connection: connections)
+        {
+            if (connection.input == inputID)
+                return true;
+        }
+
+        return false;
+    }
+
     std::vector<ConnectionDescription> connections;
 };
 
@@ -158,19 +208,5 @@ struct MIDIRouter
     State& state;
     juce::CriticalSection lock;
     OwnedVector<LiveConnection> liveConnections;
-};
-
-
-class MainComponent : public Component
-{
-public:
-    MainComponent();
-
-    void paint(Graphics&) override;
-    void resized() override;
-
-private:
-    State state;
-    MIDIRouter router {state};
 };
 } // namespace GuiApp
