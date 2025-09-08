@@ -3,57 +3,163 @@
 #include "HelloWorldLabel.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 
+template <typename T>
+using OwnedVector = std::vector<std::unique_ptr<T>>;
+
 namespace GuiApp
 {
-struct RoutingCallback : juce::MidiInputCallback
+using juce::MidiDeviceInfo;
+
+struct ConnectionDescription
 {
-    RoutingCallback(juce::MidiOutput& outputToUse)
-        : output(outputToUse)
-    {
-        DBG("Creating router");
-    }
-
-    void handleIncomingMidiMessage(juce::MidiInput*,
-                                   const juce::MidiMessage& message) override
-    {
-        DBG(message.getDescription());
-        output.sendMessageNow(message);
-    }
-
-    juce::MidiOutput& output;
+    MidiDeviceInfo input;
+    std::vector<MidiDeviceInfo> outputs;
 };
 
-struct MIDIConnector
+struct LiveConnection
 {
-    MIDIConnector()
+    bool isMatching(const ConnectionDescription& description) const
     {
-        auto outputs = juce::MidiOutput::getAvailableDevices();
+        if (input->getIdentifier() != description.input.identifier)
+            return false;
+
+        if (description.outputs.size() != outputs.size())
+            return false;
+
+        for (size_t index = 0; index < description.outputs.size(); ++index)
+        {
+            if (outputs[index]->getIdentifier() != description.outputs[index].identifier)
+                return false;
+        }
+
+        return true;
+    }
+
+    bool isValid() const
+    {
+        if (input == nullptr)
+            return false;
 
         for (auto& output: outputs)
         {
-            if (output.name.equalsIgnoreCase("USB MIDI Device Port 1"))
-            {
-                midiOut = juce::MidiOutput::openDevice(output.identifier);
-            }
+            if (output == nullptr)
+                return false;
         }
 
-        auto inputs = juce::MidiInput::getAvailableDevices();
+        return true;
+    }
 
-        for (auto& input: inputs)
+    std::unique_ptr<juce::MidiInput> input = nullptr;
+    OwnedVector<juce::MidiOutput> outputs;
+};
+
+inline std::unique_ptr<LiveConnection>
+    createConnection(const ConnectionDescription& description,
+                     juce::MidiInputCallback& cb)
+{
+    auto newConnection = std::make_unique<LiveConnection>();
+
+    auto inputDevices = juce::MidiInput::getAvailableDevices();
+
+    for (auto& device: inputDevices)
+    {
+        if (device.identifier == description.input.identifier)
         {
-            if (input.name.contains("M-Audio Hammer 88"))
+            newConnection->input =
+                juce::MidiInput::openDevice(description.input.identifier, &cb);
+        }
+    }
+
+    auto outputDevices = juce::MidiInput::getAvailableDevices();
+
+    for (auto output: description.outputs)
+    {
+        for (auto& device: outputDevices)
+        {
+            if (device.identifier == description.input.identifier)
             {
-                cb = std::make_unique<RoutingCallback>(*midiOut);
-                midiIn = juce::MidiInput::openDevice(input.identifier, cb.get());
-                midiIn->start();
+                newConnection->outputs.emplace_back(
+                    juce::MidiOutput::openDevice(description.input.identifier));
             }
         }
     }
 
-    std::unique_ptr<RoutingCallback> cb;
-    std::unique_ptr<juce::MidiInput> midiIn;
-    std::unique_ptr<juce::MidiOutput> midiOut;
+    if (newConnection->isValid())
+    {
+        newConnection->input->start();
+        return newConnection;
+    }
+
+    return nullptr;
+}
+
+struct State
+{
+    std::vector<ConnectionDescription> connections;
 };
+
+struct MIDIRouter
+    : juce::MidiInputCallback
+    , juce::Timer
+{
+    MIDIRouter(State& stateToUse)
+        : state(stateToUse)
+    {
+        update();
+        startTimerHz(1);
+    }
+
+    ~MIDIRouter() override { stopTimer(); }
+
+    void timerCallback() override { update(); }
+
+    bool isStateInvalidated() const
+    {
+        if (state.connections.size() != liveConnections.size())
+            return true;
+
+        for (size_t index = 0; index < state.connections.size(); ++index)
+        {
+            if (!liveConnections[index]->isMatching(state.connections[index]))
+                return true;
+        }
+
+        return false;
+    }
+
+    void update()
+    {
+        if (isStateInvalidated())
+        {
+            auto sl = juce::ScopedLock(lock);
+
+            liveConnections.clear();
+
+            for (auto& connection: state.connections)
+                liveConnections.emplace_back(createConnection(connection, *this));
+        }
+    }
+
+    void handleIncomingMidiMessage(juce::MidiInput* input,
+                                   const juce::MidiMessage& message) override
+    {
+        auto sl = juce::ScopedLock(lock);
+
+        for (auto& connection: liveConnections)
+        {
+            if (connection->input.get() == input)
+            {
+                for (auto& output: connection->outputs)
+                    output->sendMessageNow(message);
+            }
+        }
+    }
+
+    State& state;
+    juce::CriticalSection lock;
+    OwnedVector<LiveConnection> liveConnections;
+};
+
 
 class MainComponent : public Component
 {
@@ -64,8 +170,7 @@ public:
     void resized() override;
 
 private:
-    MIDIConnector connector;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
+    State state;
+    MIDIRouter router {state};
 };
 } // namespace GuiApp
