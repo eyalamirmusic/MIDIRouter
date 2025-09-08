@@ -23,5 +23,6 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #We 'require' that we need juce. If JUCE isn't found, it will revert to what's in
 #CMake/Findjuce.cmake, where you can see how JUCE is brought in/configured
 find_package(juce REQUIRED)
+find_package(JSON REQUIRED)
 
 add_subdirectory(Apps)

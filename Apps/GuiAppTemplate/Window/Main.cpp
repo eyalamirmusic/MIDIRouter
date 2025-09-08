@@ -74,6 +74,8 @@ struct TrayIcon : juce::SystemTrayIconComponent
             menu.addSubMenu(connection.input.name, getConnectionMenu(connection));
         }
 
+        menu.addItem("Quit", [] { juce::JUCEApplication::getInstance()->quit(); });
+
         return menu;
     }
 
@@ -102,7 +104,7 @@ public:
 
     void initialise(const String&) override { app = std::make_unique<App>(); }
 
-    void shutdown() override { app = std::make_unique<App>(); }
+    void shutdown() override { app.reset(); }
 
     void systemRequestedQuit() override { quit(); }
 
