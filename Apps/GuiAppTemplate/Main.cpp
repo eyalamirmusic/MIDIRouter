@@ -13,18 +13,38 @@ public:
     bool canPlaySound (juce::SynthesiserSound* s) override { return dynamic_cast<SineSound*>(s) != nullptr; }
     void startNote (int note, float vel, juce::SynthesiserSound*, int) override
     {
+        DBG("startNote note=" << note << "vel=" << vel);
+
+        //BUGFIX: GUI was sending MIDI fine, but tailoff never got reset
+        //After the first note tailed to near zero, new notes were multiplied
+        //by the tiny tailoff value (creating near silence)
+        //FIX: reset tailoff here so every note starts clean
+        tailOff = 0.0f; //reset tail
         level = juce::jlimit (0.05f, 1.0f, vel);
         currentAngle = 0.0;
         const auto hz = juce::MidiMessage::getMidiNoteInHertz (note);
         angleDelta = (hz / getSampleRate()) * juce::MathConstants<double>::twoPi;
     }
     void stopNote (float, bool allowTailOff) override
-    { if (allowTailOff) tailOff = 1.0; else { clearCurrentNote(); angleDelta = 0.0; } }
+    {
+        DBG("stopNote (tail=" << (allowTailOff ? "on" : "off") << ")" );
+        if (allowTailOff)
+        {
+            if (angleDelta != 0.0)
+                tailOff = 1.0f; // tailoff AFTER sounding
+        }
+        else
+        {
+            clearCurrentNote();
+            angleDelta = 0.0;
+            tailOff    = 0.0f; //clean state
+        }
+    }
     void pitchWheelMoved (int) override {}
     void controllerMoved (int, int) override {}
     void renderNextBlock (juce::AudioBuffer<float>& buf, int start, int num) override
     {
-        if (angleDelta == 0.0) return;
+        if (angleDelta == 0.0) return; //idle voice, do nothing
         auto* L = buf.getWritePointer (0, start);
         auto* R = buf.getNumChannels() > 1 ? buf.getWritePointer (1, start) : nullptr;
         while (num--)
@@ -42,10 +62,10 @@ public:
                     clearCurrentNote();
                     angleDelta=0.0;
                     // break;
-                    s = 0.0f;
+                    s = 0.0f; //write zeros for rest of block
                 }
             }
-            *L++ += s; //adding instead of overwriting
+            *L++ += s; //adding/mixing instead of overwriting
             if (R) *R++ += s;
         }
     }
@@ -61,8 +81,10 @@ public:
     {
         for (int i = 0; i < 8; ++i) synth.addVoice (new SineVoice());
         synth.addSound (new SineSound());
-        collector.reset (44100.0);
+        // collector.reset (44100.0);
     }
+
+
 
     juce::MidiKeyboardState    keyboardState;   // for on-screen keyboard
     juce::MidiMessageCollector collector;       // router will push MIDI here
