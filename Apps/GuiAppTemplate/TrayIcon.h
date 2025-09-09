@@ -1,7 +1,6 @@
 #pragma once
 
 #include "State.h"
-#include <BinaryData.h>
 
 namespace MIDIRouterApp
 {
@@ -18,8 +17,16 @@ public:
 
 inline juce::Image getLogoImage()
 {
-    return juce::ImageCache::getFromMemory(BinaryData::Logo_png,
-                                           BinaryData::Logo_pngSize);
+    auto newImage = juce::Image(juce::Image::ARGB, 128, 128, true);
+
+    {
+        auto g = juce::Graphics(newImage);
+        g.setColour(juce::Colours::white);
+        g.setFont(juce::Font(juce::FontOptions()).withHeight(95));
+        g.drawFittedText("MIDI", {0,0, 128, 128}, juce::Justification::centred, 1);
+    }
+
+    return newImage;
 }
 
 struct TrayIcon : juce::SystemTrayIconComponent
@@ -29,6 +36,12 @@ struct TrayIcon : juce::SystemTrayIconComponent
     {
         setIconImage(getLogoImage(), getLogoImage());
         setIconTooltip("I'm the MIDI router! Good stuff");
+    }
+
+    void resized() override
+    {
+        DBG("Resized");
+        DBG(getLocalBounds().toString());
     }
 
     juce::PopupMenu createAddConnectionSubMenu() const
@@ -86,4 +99,4 @@ struct TrayIcon : juce::SystemTrayIconComponent
     State& state;
 };
 
-} // namespace GuiApp
+} // namespace MIDIRouterApp

@@ -16,8 +16,6 @@ target_compile_definitions(${TargetName} PRIVATE
         JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:${TargetName},JUCE_PROJECT_NAME>"
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:${TargetName},JUCE_VERSION>")
 
-juce_add_binary_data(MIDIRouterResources SOURCES
-        Resources/Logo.png)
 
 target_link_libraries(${TargetName} PRIVATE
         juce_recommended_config_flags
@@ -25,5 +23,4 @@ target_link_libraries(${TargetName} PRIVATE
         juce_recommended_warning_flags
         juce_gui_extra
         juce_audio_utils
-        MIDIRouterResources
         JSON)
