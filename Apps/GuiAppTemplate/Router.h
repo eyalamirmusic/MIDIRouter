@@ -67,10 +67,16 @@ struct MIDIRouter
                     output->sendMessageNow(message);
             }
         }
+
+        if (midiTap != nullptr)
+            midiTap->addMessageToQueue(message);
     }
 
     State& state;
     juce::CriticalSection lock;
     OwnedVector<LiveConnection> liveConnections;
+
+    juce::MidiMessageCollector* midiTap = nullptr;
+
 };
 }
