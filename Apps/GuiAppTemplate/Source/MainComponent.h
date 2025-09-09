@@ -161,6 +161,8 @@ inline std::unique_ptr<LiveConnection>
         return newConnection;
     }
 
+    std::cout << "invalid connection\n";
+
     return nullptr;
 }
 
@@ -264,8 +266,8 @@ struct MIDIRouter
     MIDIRouter(State& stateToUse)
         : state(stateToUse)
     {
-        update();
         startTimerHz(1);
+        update();
     }
 
     ~MIDIRouter() override { stopTimer(); }
@@ -288,14 +290,21 @@ struct MIDIRouter
 
     void update()
     {
+        auto sl = juce::ScopedLock(lock);
+
         if (isStateInvalidated())
         {
-            auto sl = juce::ScopedLock(lock);
+            std::cout << "Invalidated\n";
 
             liveConnections.clear();
 
+            std::cout << "Cleared connections\n";
+
             for (auto& connection: state.connections)
-                liveConnections.emplace_back(createConnection(connection, *this));
+            {
+                if (auto newConnection = createConnection(connection, *this))
+                    liveConnections.emplace_back(std::move(newConnection));
+            }
         }
     }
 

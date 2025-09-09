@@ -4,12 +4,7 @@ set (TargetName ${PROJECT_NAME})
 
 juce_add_gui_app(${TargetName} PRODUCT_NAME "MIDI Router")
 
-set(source_files
-        Window/Main.cpp
-
-        Source/CommonHeader.h
-        Source/MainComponent.h
-        Source/MainComponent.cpp)
+set(source_files Window/Main.cpp)
 
 target_sources(${TargetName} PRIVATE ${source_files})
 
