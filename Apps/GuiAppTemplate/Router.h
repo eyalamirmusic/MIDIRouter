@@ -3,7 +3,7 @@
 #include "State.h"
 #include "LiveConnection.h"
 
-namespace GuiApp
+namespace MIDIRouterApp
 {
 struct MIDIRouter
     : juce::MidiInputCallback

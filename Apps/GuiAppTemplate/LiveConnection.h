@@ -2,7 +2,7 @@
 
 #include "ConnectionDescription.h"
 
-namespace GuiApp
+namespace MIDIRouterApp
 {
 struct LiveConnection
 {

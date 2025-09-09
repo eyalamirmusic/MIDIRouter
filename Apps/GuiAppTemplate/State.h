@@ -2,7 +2,7 @@
 
 #include "ConnectionDescription.h"
 
-namespace GuiApp
+namespace MIDIRouterApp
 {
 
 inline juce::File getPrefsFile()

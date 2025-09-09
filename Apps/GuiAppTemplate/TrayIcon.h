@@ -3,7 +3,7 @@
 #include "State.h"
 #include <BinaryData.h>
 
-namespace GuiApp
+namespace MIDIRouterApp
 {
 class DummyMenuBarModel final : public juce::MenuBarModel
 {

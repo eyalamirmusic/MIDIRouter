@@ -1,7 +1,7 @@
 #include "TrayIcon.h"
 #include "Router.h"
 
-namespace GuiApp
+namespace MIDIRouterApp
 {
 struct App
 {
@@ -36,4 +36,4 @@ private:
 } // namespace GuiApp
 
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION(GuiApp::GuiAppTemplateApplication)
+START_JUCE_APPLICATION(MIDIRouterApp::GuiAppTemplateApplication)

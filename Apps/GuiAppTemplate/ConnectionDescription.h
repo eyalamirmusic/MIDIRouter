@@ -2,7 +2,7 @@
 
 #include "CommonHeader.h"
 
-namespace GuiApp
+namespace MIDIRouterApp
 {
 using juce::MidiDeviceInfo;
 

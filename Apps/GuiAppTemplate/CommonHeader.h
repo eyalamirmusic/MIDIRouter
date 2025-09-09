@@ -4,7 +4,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <nlohmann/json.hpp>
 
-namespace GuiApp
+namespace MIDIRouterApp
 {
 template <typename T>
 using OwnedVector = std::vector<std::unique_ptr<T>>;
