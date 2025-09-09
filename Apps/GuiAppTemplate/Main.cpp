@@ -14,6 +14,9 @@ struct App
 class GuiAppTemplateApplication : public juce::JUCEApplication
 {
 public:
+    GuiAppTemplateApplication() { juce::Process::setDockIconVisible(false); }
+
+private:
     const String getApplicationName() override { return JUCE_APPLICATION_NAME_STRING; }
     const String getApplicationVersion() override
     {
@@ -29,11 +32,10 @@ public:
 
     void anotherInstanceStarted(const String& /*commandLine*/) override {}
 
-private:
     std::unique_ptr<App> app;
 };
 
-} // namespace GuiApp
+} // namespace MIDIRouterApp
 
 // This macro generates the main() routine that launches the app.
 START_JUCE_APPLICATION(MIDIRouterApp::GuiAppTemplateApplication)
