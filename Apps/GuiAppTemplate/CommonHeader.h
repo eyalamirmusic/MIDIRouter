@@ -6,6 +6,9 @@
 
 namespace GuiApp
 {
+template <typename T>
+using OwnedVector = std::vector<std::unique_ptr<T>>;
+
 using JSON = nlohmann::json;
 //To save some typing, we're gonna import a few commonly used juce classes
 //into our namespace
