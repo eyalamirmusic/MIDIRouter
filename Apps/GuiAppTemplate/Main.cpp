@@ -1,5 +1,6 @@
 #include "TrayIcon.h"
 #include "Router.h"
+#include "ConnectionsWindow.h"
 
 namespace MIDIRouterApp
 {
@@ -9,6 +10,7 @@ struct App
     MIDIRouter router {state};
     DummyMenuBarModel dummyMenuBar;
     TrayIcon icon {state};
+    std::unique_ptr<ConnectionsWindow> connectionsWindow;
 };
 
 class GuiAppTemplateApplication : public juce::JUCEApplication
@@ -24,7 +26,11 @@ private:
     }
     bool moreThanOneInstanceAllowed() override { return false; }
 
-    void initialise(const String&) override { app = std::make_unique<App>(); }
+    void initialise(const String&) override
+    {
+        app = std::make_unique<App>();
+        app->connectionsWindow = std::make_unique<ConnectionsWindow>(app->state);
+    }
 
     void shutdown() override { app.reset(); }
 
