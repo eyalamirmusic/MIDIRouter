@@ -84,8 +84,6 @@ public:
         // collector.reset (44100.0);
     }
 
-
-
     juce::MidiKeyboardState    keyboardState;   // for on-screen keyboard
     juce::MidiMessageCollector collector;       // router will push MIDI here
 
@@ -168,15 +166,15 @@ private:
     void initialise(const String&) override
     {
         app = std::make_unique<App>();
-
-        app->dm.initialiseWithDefaultDevices(0,2);
-        app->player= std::make_unique<juce::AudioSourcePlayer>();
-        app->player->setSource((&app->testAudio));
-        app->dm.addAudioCallback((app->player.get()));
-
-        app->router.midiTap = &app->testAudio.collector;
-
-        app->testWindow = std::make_unique<TestSynthWindow> (app->testAudio.keyboardState);
+        //
+        // app->dm.initialiseWithDefaultDevices(0,2);
+        // app->player= std::make_unique<juce::AudioSourcePlayer>();
+        // app->player->setSource((&app->testAudio));
+        // app->dm.addAudioCallback((app->player.get()));
+        //
+        // app->router.midiTap = &app->testAudio.collector;
+        //
+        // app->testWindow = std::make_unique<TestSynthWindow> (app->testAudio.keyboardState);
 
     }
 
