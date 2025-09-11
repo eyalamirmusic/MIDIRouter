@@ -100,24 +100,32 @@ struct TrayIcon : juce::SystemTrayIconComponent
 
         auto inputs = juce::MidiInput::getAvailableDevices();
 
-        for (auto &input: inputs) {
-            if (state.hasConnection(input)) {
-                for (auto &connection: state.connections) {
-                    if (connection.input == input) {
+        for (auto &input: inputs)
+        {
+            if (state.hasConnection(input))
+            {
+                for (auto &connection: state.connections)
+                {
+                    if (connection.input == input)
+                    {
                         menu.addSubMenu(input.name,
                                         getConnectionMenu(connection),
                                         true);
                     }
                 }
-            } else {
+            }
+            else
+            {
                 auto addItemFunc = [input, this] { state.createConnection(input); };
                 menu.addItem(input.name, addItemFunc);
             }
         }
 
         if (inputs.isEmpty())
-            menu.addItem("no inputs found", false, false, [] {
-            });
+            menu.addItem("no inputs found",
+                         false,
+                         false,
+                         [] {});
 
         menu.addSeparator();
         menu.addItem("Quit", [] { juce::JUCEApplication::getInstance()->quit(); });
