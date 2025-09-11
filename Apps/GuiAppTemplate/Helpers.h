@@ -7,20 +7,37 @@ namespace MIDIRouterApp::Helpers
     inline juce::PopupMenu getOutputsMenu(State& state,
                                           const juce::MidiDeviceInfo& inputInfo)
     {
-        auto menu    = juce::PopupMenu();
+        auto menu = juce::PopupMenu();
         auto outputs = juce::MidiOutput::getAvailableDevices();
+
+        bool currTicked = false;
 
         for (auto& output : outputs)
         {
             const bool ticked = state.isRouted(inputInfo, output);
-            menu.addItem(output.name, true, ticked,
-                         [&state, inputInfo, output] { state.toggleConnection(inputInfo, output); });
+            if (ticked) currTicked = true;
+
+            menu.addItem(output.name,
+                         true,
+                         ticked,
+                         [&state, inputInfo, output] { state.toggleConnection(inputInfo, output);});
         }
 
         if (outputs.isEmpty())
-            menu.addItem("(no MIDI outputs found)", false, false, nullptr);
+        {
+            menu.addItem("no MIDI outputs found",
+                         false,
+                         false,
+                         nullptr);
+        }
+
+        menu.addItem("Disconnect all",
+            currTicked,
+            false,
+            [&state, inputInfo] {state.disconnectAll(inputInfo);});
 
         return menu;
+
     }
 
     inline juce::PopupMenu getMenu(State& state)

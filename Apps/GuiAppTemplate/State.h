@@ -96,18 +96,31 @@ struct State
         return false;
     }
 
+    ConnectionDescription* getConnection(const MidiDeviceInfo& inputID)
+    {
+        for (auto& c : connections)
+            if (c.input == inputID) return &c;
+        return nullptr;
+    }
+
     void toggleConnection(const juce::MidiDeviceInfo& inputID,
                       const juce::MidiDeviceInfo& outputID)
     {
         if (!hasConnection(inputID))
             createConnection(inputID);
 
+        if (auto* c = getConnection(inputID))
+            c->toggle(outputID);
+    }
+
+    void disconnectAll(const juce::MidiDeviceInfo& inputID)
+    {
         for (auto& c : connections)
         {
             if (c.input == inputID)
             {
-                c.toggle(outputID);
-                break;
+                c.outputs.clear();
+                return;
             }
         }
     }
