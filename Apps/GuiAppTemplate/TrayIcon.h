@@ -79,16 +79,55 @@ struct TrayIcon : juce::SystemTrayIconComponent
         return menu;
     }
 
-    juce::PopupMenu getMenu() const
+    // juce::PopupMenu getMenu() const
+    // {
+    //     auto menu = juce::PopupMenu();
+    //     menu.addSubMenu("Add Connection", createAddConnectionSubMenu());
+    //
+    //     for (auto& connection: state.connections)
+    //     {
+    //         menu.addSubMenu(connection.input.name, getConnectionMenu(connection));
+    //     }
+    //
+    //     menu.addItem("Quit", [] { juce::JUCEApplication::getInstance()->quit(); });
+    //
+    //     return menu;
+    // }
+
+    juce::PopupMenu getMenu() //dropped const
     {
         auto menu = juce::PopupMenu();
-        menu.addSubMenu("Add Connection", createAddConnectionSubMenu());
 
-        for (auto& connection: state.connections)
+        auto inputs = juce::MidiInput::getAvailableDevices();
+
+        for (auto &input: inputs)
         {
-            menu.addSubMenu(connection.input.name, getConnectionMenu(connection));
+            if (state.hasConnection(input))
+            {
+                for (auto &connection: state.connections)
+                {
+                    if (connection.input == input)
+                    {
+                        menu.addSubMenu(input.name,
+                                        getConnectionMenu(connection),
+                                        true);
+                    }
+                }
+            }
+            else
+            {
+                auto addItemFunc = [input, this] { state.createConnection(input); };
+                menu.addItem(input.name, addItemFunc);
+            }
         }
 
+        if (inputs.isEmpty())
+            menu.addItem("no inputs found",
+                         false,
+                         false,
+                         [] {});
+
+        menu.addSeparator();
         menu.addItem("Quit", [] { juce::JUCEApplication::getInstance()->quit(); });
 
         return menu;
