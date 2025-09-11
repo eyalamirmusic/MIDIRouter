@@ -4,8 +4,10 @@
 struct MenuLookAndFeel : public juce::LookAndFeel_V4
 {
     int getDefaultMenuBarHeight() override {return 24;}
-    juce::Font getMenuBarFont(juce::MenuBarComponent &, int itemIndex, const juce::String &itemText) override
+    juce::Font getMenuBarFont(juce::MenuBarComponent&, int itemIndex, const juce::String& itemText) override
     {
-        return juce::Font(14.0f);
+        juce::ignoreUnused(itemIndex, itemText);
+        return juce::Font(juce::FontOptions().withHeight(14.0f));
     }
+
 };

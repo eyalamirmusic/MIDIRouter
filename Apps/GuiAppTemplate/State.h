@@ -16,6 +16,7 @@ struct State
 {
     State() { loadFromFile(); }
 
+
     ~State() { saveToFile(); }
 
     void createConnection(const MidiDeviceInfo& inputID)
@@ -92,6 +93,33 @@ struct State
                 return true;
         }
 
+        return false;
+    }
+
+    void toggleConnection(const juce::MidiDeviceInfo& inputID,
+                      const juce::MidiDeviceInfo& outputID)
+    {
+        if (!hasConnection(inputID))
+            createConnection(inputID);
+
+        for (auto& c : connections)
+        {
+            if (c.input == inputID)
+            {
+                c.toggle(outputID);
+                break;
+            }
+        }
+    }
+
+    bool isRouted(const juce::MidiDeviceInfo& inputID,
+              const juce::MidiDeviceInfo& outputID) const
+    {
+        for (auto& c : connections)
+        {
+            if (c.input == inputID)
+                return c.hasOutput(outputID);
+        }
         return false;
     }
 
