@@ -36,15 +36,11 @@ struct MIDIRouter
 
     void update()
     {
-        auto sl = juce::ScopedLock(lock);
+        auto sl = EA::Locks::ScopedSpinLock (lock);
 
         if (isStateInvalidated())
         {
-            std::cout << "Invalidated\n";
-
             liveConnections.clear();
-
-            std::cout << "Cleared connections\n";
 
             for (auto& connection: state.connections)
             {
@@ -54,10 +50,10 @@ struct MIDIRouter
         }
     }
 
-    void handleIncomingMidiMessage(juce::MidiInput* input,
+    void handleIncomingMidiMessage(MidiInput* input,
                                    const juce::MidiMessage& message) override
     {
-        auto sl = juce::ScopedLock(lock);
+        auto sl = EA::Locks::ScopedSpinLock (lock);
 
         for (auto& connection: liveConnections)
         {
@@ -70,7 +66,7 @@ struct MIDIRouter
     }
 
     State& state;
-    juce::CriticalSection lock;
+    EA::Locks::RecursiveSpinLock lock;
     OwnedVector<LiveConnection> liveConnections;
 };
-}
+} // namespace MIDIRouterApp
