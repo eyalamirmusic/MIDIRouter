@@ -1,1 +1,1 @@
-add_subdirectory(GuiAppTemplate)
+add_subdirectory(MIDIRouter)
