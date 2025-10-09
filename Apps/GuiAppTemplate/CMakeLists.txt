@@ -18,9 +18,8 @@ target_compile_definitions(${TargetName} PRIVATE
 
 
 target_link_libraries(${TargetName} PRIVATE
-        juce_recommended_config_flags
-        juce_recommended_lto_flags
-        juce_recommended_warning_flags
+        ea_default_config
         juce_gui_extra
         juce_audio_utils
+        ea_data_structures
         JSON)
