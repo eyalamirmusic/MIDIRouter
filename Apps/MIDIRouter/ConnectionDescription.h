@@ -81,6 +81,6 @@ struct ConnectionDescription
     }
 
     MidiDeviceInfo input;
-    std::vector<MidiDeviceInfo> outputs;
+    Vector<MidiDeviceInfo> outputs;
 };
 }

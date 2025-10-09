@@ -24,7 +24,7 @@ private:
     }
     bool moreThanOneInstanceAllowed() override { return false; }
 
-    void initialise(const String&) override { app = std::make_unique<App>(); }
+    void initialise(const String&) override { app.create(); }
 
     void shutdown() override { app.reset(); }
 
@@ -32,7 +32,7 @@ private:
 
     void anotherInstanceStarted(const String& /*commandLine*/) override {}
 
-    std::unique_ptr<App> app;
+    OwningPointer<App> app;
 };
 
 } // namespace MIDIRouterApp

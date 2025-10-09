@@ -14,7 +14,7 @@ struct LiveConnection
         if (description.outputs.size() != outputs.size())
             return false;
 
-        for (size_t index = 0; index < description.outputs.size(); ++index)
+        for (int index = 0; index < description.outputs.size(); ++index)
         {
             if (outputs[index]->getIdentifier() != description.outputs[index].identifier)
                 return false;
@@ -37,28 +37,28 @@ struct LiveConnection
         return true;
     }
 
-    std::unique_ptr<juce::MidiInput> input = nullptr;
-    OwnedVector<juce::MidiOutput> outputs;
+    OwningPointer<MidiInput> input = nullptr;
+    OwnedVector<MidiOutput> outputs;
 };
 
-inline std::unique_ptr<LiveConnection>
+inline OwningPointer<LiveConnection>
     createConnection(const ConnectionDescription& description,
                      juce::MidiInputCallback& cb)
 {
-    auto newConnection = std::make_unique<LiveConnection>();
+    auto newConnection = EA::makeOwned<LiveConnection>();
 
-    auto inputDevices = juce::MidiInput::getAvailableDevices();
+    auto inputDevices = MidiInput::getAvailableDevices();
 
     for (auto& device: inputDevices)
     {
         if (device.identifier == description.input.identifier)
         {
             newConnection->input =
-                juce::MidiInput::openDevice(description.input.identifier, &cb);
+                MidiInput::openDevice(description.input.identifier, &cb);
         }
     }
 
-    auto outputDevices = juce::MidiOutput::getAvailableDevices();
+    auto outputDevices = MidiOutput::getAvailableDevices();
 
     for (auto output: description.outputs)
     {
@@ -66,8 +66,7 @@ inline std::unique_ptr<LiveConnection>
         {
             if (device.identifier == output.identifier)
             {
-                newConnection->outputs.emplace_back(
-                    juce::MidiOutput::openDevice(output.identifier));
+                newConnection->outputs.create(MidiOutput::openDevice(output.identifier));
             }
         }
     }
@@ -82,4 +81,4 @@ inline std::unique_ptr<LiveConnection>
 
     return nullptr;
 }
-} // namespace GuiApp
+} // namespace MIDIRouterApp

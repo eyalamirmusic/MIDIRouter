@@ -22,7 +22,7 @@ struct State
     {
         if (!hasConnection(inputID))
         {
-            connections.emplace_back();
+            connections.create();
             connections.back().input = inputID;
         }
     }
@@ -79,7 +79,7 @@ struct State
 
         for (auto& element: json)
         {
-            connections.emplace_back();
+            connections.create();
             connections.back().load(element);
         }
     }
@@ -95,7 +95,7 @@ struct State
         return false;
     }
 
-    std::vector<ConnectionDescription> connections;
+    Vector<ConnectionDescription> connections;
 };
 
 } // namespace GuiApp

@@ -3,11 +3,13 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <nlohmann/json.hpp>
+#include <ea_data_structures/ea_data_structures.h>
 
 namespace MIDIRouterApp
 {
-template <typename T>
-using OwnedVector = std::vector<std::unique_ptr<T>>;
+using EA::OwnedVector;
+using EA::Vector;
+using EA::OwningPointer;
 
 using JSON = nlohmann::json;
 //To save some typing, we're gonna import a few commonly used juce classes
@@ -16,4 +18,6 @@ using juce::Colour;
 using juce::Component;
 using juce::Graphics;
 using juce::String;
+using juce::MidiInput;
+using juce::MidiOutput;
 } // namespace GuiApp

@@ -25,7 +25,7 @@ struct MIDIRouter
         if (state.connections.size() != liveConnections.size())
             return true;
 
-        for (size_t index = 0; index < state.connections.size(); ++index)
+        for (int index = 0; index < state.connections.size(); ++index)
         {
             if (!liveConnections[index]->isMatching(state.connections[index]))
                 return true;
