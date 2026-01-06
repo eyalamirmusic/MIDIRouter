@@ -23,4 +23,5 @@ find_package(EADataStructures)
 include(CMake/Warnings.cmake)
 include(CMake/Utils.cmake)
 
+add_subdirectory(Modules)
 add_subdirectory(Apps)

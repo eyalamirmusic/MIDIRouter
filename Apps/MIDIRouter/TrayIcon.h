@@ -1,6 +1,7 @@
 #pragma once
 
 #include "State.h"
+#include <ea_midirouter_ui_utils/ea_midirouter_ui_utils.h>
 
 namespace MIDIRouterApp
 {
@@ -15,26 +16,13 @@ public:
     void menuItemSelected(int, int) override {}
 };
 
-inline juce::Image getLogoImage()
-{
-    auto newImage = juce::Image(juce::Image::ARGB, 128, 128, true);
-
-    {
-        auto g = juce::Graphics(newImage);
-        g.setColour(juce::Colours::white);
-        g.setFont(juce::Font(juce::FontOptions()).withHeight(95));
-        g.drawFittedText("MIDI", {0,0, 128, 128}, juce::Justification::centred, 1);
-    }
-
-    return newImage;
-}
-
 struct TrayIcon : juce::SystemTrayIconComponent
 {
     TrayIcon(State& stateToUse)
         : state(stateToUse)
     {
-        setIconImage(getLogoImage(), getLogoImage());
+        auto image = MIDIRouterUtils::getLogoImage(128);
+        setIconImage(image, image);
         setIconTooltip("I'm the MIDI router! Good stuff");
     }
 

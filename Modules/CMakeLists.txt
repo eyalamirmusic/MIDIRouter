@@ -1,0 +1,1 @@
+juce_add_modules(ea_midirouter_ui_utils)
