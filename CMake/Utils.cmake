@@ -1,0 +1,5 @@
+function(read_plist_cache file cacheVar)
+    file(READ ${file} plistFile)
+    string(REGEX REPLACE "\n" "" plistFile "${plistFile}")
+    set(${cacheVar} ${plistFile} CACHE STRING "")
+endfunction()

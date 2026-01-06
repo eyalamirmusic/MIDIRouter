@@ -14,7 +14,7 @@ struct App
 class GuiAppTemplateApplication : public juce::JUCEApplication
 {
 public:
-    GuiAppTemplateApplication() { juce::Process::setDockIconVisible(false); }
+    GuiAppTemplateApplication() = default;
 
 private:
     const String getApplicationName() override { return JUCE_APPLICATION_NAME_STRING; }
