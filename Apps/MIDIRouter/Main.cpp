@@ -17,7 +17,10 @@ public:
     GuiAppTemplateApplication() = default;
 
 private:
-    const String getApplicationName() override { return JUCE_APPLICATION_NAME_STRING; }
+    const String getApplicationName() override
+    {
+        return JUCE_APPLICATION_NAME_STRING;
+    }
     const String getApplicationVersion() override
     {
         return JUCE_APPLICATION_VERSION_STRING;

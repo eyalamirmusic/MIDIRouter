@@ -61,7 +61,8 @@ struct TrayIcon : juce::SystemTrayIconComponent
         for (auto& output: outputs)
         {
             auto connectFunc = [output, &connection] { connection.toggle(output); };
-            menu.addItem(output.name, true, connection.hasOutput(output), connectFunc);
+            menu.addItem(
+                output.name, true, connection.hasOutput(output), connectFunc);
         }
 
         return menu;

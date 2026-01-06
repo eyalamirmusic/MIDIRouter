@@ -36,7 +36,7 @@ struct MIDIRouter
 
     void update()
     {
-        auto sl = EA::Locks::ScopedSpinLock (lock);
+        auto sl = EA::Locks::ScopedSpinLock(lock);
 
         if (isStateInvalidated())
         {
@@ -53,7 +53,7 @@ struct MIDIRouter
     void handleIncomingMidiMessage(MidiInput* input,
                                    const juce::MidiMessage& message) override
     {
-        auto sl = EA::Locks::ScopedSpinLock (lock);
+        auto sl = EA::Locks::ScopedSpinLock(lock);
 
         for (auto& connection: liveConnections)
         {

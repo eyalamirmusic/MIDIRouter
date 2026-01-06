@@ -83,4 +83,4 @@ struct ConnectionDescription
     MidiDeviceInfo input;
     Vector<MidiDeviceInfo> outputs;
 };
-}
+} // namespace MIDIRouterApp

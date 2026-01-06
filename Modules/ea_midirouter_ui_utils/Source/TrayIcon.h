@@ -4,6 +4,8 @@
 
 namespace MIDIRouterUtils
 {
+juce::Image getLogoImage(int size,
+                         const juce::Colour& bgColor = juce::Colours::white);
 
-juce::Image getLogoImage(int size);
-}
+juce::Image getIconImage();
+} // namespace MIDIRouterUtils

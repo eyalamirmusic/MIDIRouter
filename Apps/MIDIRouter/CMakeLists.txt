@@ -1,11 +1,14 @@
 project(MIDIRouter VERSION 0.0.1)
 
-set (TargetName ${PROJECT_NAME})
+set(TargetName ${PROJECT_NAME})
+set(IconPNG ${CMAKE_CURRENT_LIST_DIR}/MIDIRouterIcon.png)
 
 read_plist_cache(AppInfo.plist appInfoPlist)
 juce_add_gui_app(${TargetName}
         PRODUCT_NAME "MIDI Router"
-        PLIST_TO_MERGE ${appInfoPlist})
+        PLIST_TO_MERGE ${appInfoPlist}
+        ICON_BIG ${IconPNG}
+        ICON_SMALL ${IconPNG})
 
 target_sources(${TargetName} PRIVATE Main.cpp)
 

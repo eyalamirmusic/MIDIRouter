@@ -8,8 +8,8 @@
 namespace MIDIRouterApp
 {
 using EA::OwnedVector;
-using EA::Vector;
 using EA::OwningPointer;
+using EA::Vector;
 
 using JSON = nlohmann::json;
 //To save some typing, we're gonna import a few commonly used juce classes
@@ -17,7 +17,7 @@ using JSON = nlohmann::json;
 using juce::Colour;
 using juce::Component;
 using juce::Graphics;
-using juce::String;
 using juce::MidiInput;
 using juce::MidiOutput;
-} // namespace GuiApp
+using juce::String;
+} // namespace MIDIRouterApp

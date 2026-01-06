@@ -98,4 +98,4 @@ struct State
     Vector<ConnectionDescription> connections;
 };
 
-} // namespace GuiApp
+} // namespace MIDIRouterApp

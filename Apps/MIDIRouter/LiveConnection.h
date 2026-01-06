@@ -16,7 +16,8 @@ struct LiveConnection
 
         for (int index = 0; index < description.outputs.size(); ++index)
         {
-            if (outputs[index]->getIdentifier() != description.outputs[index].identifier)
+            if (outputs[index]->getIdentifier()
+                != description.outputs[index].identifier)
                 return false;
         }
 
@@ -66,7 +67,8 @@ inline OwningPointer<LiveConnection>
         {
             if (device.identifier == output.identifier)
             {
-                newConnection->outputs.create(MidiOutput::openDevice(output.identifier));
+                newConnection->outputs.create(
+                    MidiOutput::openDevice(output.identifier));
             }
         }
     }

@@ -1,1 +1,2 @@
 add_subdirectory(MIDIRouter)
+add_subdirectory(IconGenerator)
