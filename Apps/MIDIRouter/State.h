@@ -95,6 +95,7 @@ struct State
         return false;
     }
 
+    std::function<void()> rebuildConnections = []{};
     Vector<ConnectionDescription> connections;
 };
 

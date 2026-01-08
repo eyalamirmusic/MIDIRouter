@@ -78,6 +78,7 @@ struct TrayIcon : juce::SystemTrayIconComponent
             menu.addSubMenu(connection.input.name, getConnectionMenu(connection));
         }
 
+        menu.addItem("Restart Connections", [&] { state.rebuildConnections(); });
         menu.addItem("Quit", [] { juce::JUCEApplication::getInstance()->quit(); });
 
         return menu;

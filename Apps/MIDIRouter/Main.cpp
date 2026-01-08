@@ -18,13 +18,9 @@ public:
 
 private:
     const String getApplicationName() override
-    {
-        return JUCE_APPLICATION_NAME_STRING;
-    }
+    { return JUCE_APPLICATION_NAME_STRING; }
     const String getApplicationVersion() override
-    {
-        return JUCE_APPLICATION_VERSION_STRING;
-    }
+    { return JUCE_APPLICATION_VERSION_STRING; }
     bool moreThanOneInstanceAllowed() override { return false; }
 
     void initialise(const String&) override { app.create(); }

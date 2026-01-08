@@ -2,6 +2,7 @@
 
 #include "State.h"
 #include "LiveConnection.h"
+#include "Native/WakeListener.h"
 
 namespace MIDIRouterApp
 {
@@ -14,6 +15,7 @@ struct MIDIRouter
     {
         startTimerHz(1);
         update();
+        state.rebuildConnections = [&] { rebuildConnections(); };
     }
 
     ~MIDIRouter() override { stopTimer(); }
@@ -34,20 +36,30 @@ struct MIDIRouter
         return false;
     }
 
+    void rebuildConnections()
+    {
+        auto sl = EA::Locks::ScopedSpinLock(lock);
+
+        liveConnections.clear();
+
+        for (auto& connection: state.connections)
+        {
+            if (auto newConnection = createConnection(connection, *this))
+                liveConnections.emplace_back(std::move(newConnection));
+        }
+    }
+
+    void delayedRebuild()
+    {
+        juce::Timer::callAfterDelay(2000, [this] { rebuildConnections(); });
+    }
+
     void update()
     {
         auto sl = EA::Locks::ScopedSpinLock(lock);
 
         if (isStateInvalidated())
-        {
-            liveConnections.clear();
-
-            for (auto& connection: state.connections)
-            {
-                if (auto newConnection = createConnection(connection, *this))
-                    liveConnections.emplace_back(std::move(newConnection));
-            }
-        }
+            rebuildConnections();
     }
 
     void handleIncomingMidiMessage(MidiInput* input,
@@ -68,5 +80,6 @@ struct MIDIRouter
     State& state;
     EA::Locks::RecursiveSpinLock lock;
     OwnedVector<LiveConnection> liveConnections;
+    Native::WakeListener wake {[&] { delayedRebuild(); }};
 };
 } // namespace MIDIRouterApp

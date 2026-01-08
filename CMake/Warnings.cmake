@@ -1,14 +1,3 @@
-add_library(ea_default_config INTERFACE
-        ../Modules/ea_midirouter_ui_utils/ea_midirouter_ui_utils.cpp
-        ../Modules/ea_midirouter_ui_utils/ea_midirouter_ui_utils.h
-        ../Modules/ea_midirouter_ui_utils/Source/TrayIcon.cpp
-        ../Modules/ea_midirouter_ui_utils/Source/TrayIcon.h
-        ../Apps/IconGenerator/Main.cpp)
-target_link_libraries(ea_default_config INTERFACE
-        juce_recommended_warning_flags
-        juce_recommended_config_flags
-        juce_recommended_lto_flags)
-
 function(set_default_app_config target)
     target_compile_definitions(${target} PRIVATE
             JUCE_WEB_BROWSER=0

@@ -2,7 +2,7 @@
 
 using juce::File;
 
-File createTargetFile()
+static File createTargetFile()
 {
     auto file = File::getSpecialLocation(File::userDesktopDirectory)
                     .getChildFile("MIDIRouterIcon.png");

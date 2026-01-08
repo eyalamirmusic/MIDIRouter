@@ -10,7 +10,16 @@ juce_add_gui_app(${TargetName}
         ICON_BIG ${IconPNG}
         ICON_SMALL ${IconPNG})
 
-target_sources(${TargetName} PRIVATE Main.cpp)
+target_sources(${TargetName} PRIVATE
+        Main.cpp)
+
+if (APPLE)
+    target_sources(${TargetName} PRIVATE
+        Native/WakeListener.mm)
+else()
+    target_sources(${TargetName} PRIVATE
+        Native/WakeListener.cpp)
+endif ()
 
 set_default_app_config(${TargetName})
 
