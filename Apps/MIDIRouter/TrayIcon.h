@@ -36,13 +36,13 @@ struct TrayIcon : juce::SystemTrayIconComponent
     {
         auto menu = juce::PopupMenu();
 
-        auto inputs = juce::MidiInput::getAvailableDevices();
+        auto inputs = RTMIDI::getPortList().inputs;
 
         for (auto& input: inputs)
         {
-            if (!state.hasConnection(input))
+            if (!state.hasConnection(input.name))
             {
-                auto addItemFunc = [input, this] { state.createConnection(input); };
+                auto addItemFunc = [input, this] { state.createConnection(input.name); };
                 menu.addItem(input.name, addItemFunc);
             }
         }
@@ -54,15 +54,15 @@ struct TrayIcon : juce::SystemTrayIconComponent
     {
         auto menu = juce::PopupMenu();
 
-        menu.addItem("In:" + connection.input.name, false, false, [] {});
+        menu.addItem("In:" + connection.input, false, false, [] {});
 
-        auto outputs = juce::MidiOutput::getAvailableDevices();
+        auto outputs = RTMIDI::getPortList().outputs;
 
         for (auto& output: outputs)
         {
-            auto connectFunc = [output, &connection] { connection.toggle(output); };
+            auto connectFunc = [output, &connection] { connection.toggle(output.name); };
             menu.addItem(
-                output.name, true, connection.hasOutput(output), connectFunc);
+                output.name, true, connection.hasOutput(output.name), connectFunc);
         }
 
         return menu;
@@ -75,7 +75,7 @@ struct TrayIcon : juce::SystemTrayIconComponent
 
         for (auto& connection: state.connections)
         {
-            menu.addSubMenu(connection.input.name, getConnectionMenu(connection));
+            menu.addSubMenu(connection.input, getConnectionMenu(connection));
         }
 
         menu.addItem("Restart Connections", [&] { state.rebuildConnections(); });

@@ -18,7 +18,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 find_package(juce REQUIRED)
 find_package(JSON REQUIRED)
-find_package(EADataStructures)
+find_package(EADataStructures REQUIRED)
+find_package(RTMidi-Interface REQUIRED)
 
 include(CMake/Warnings.cmake)
 include(CMake/Utils.cmake)

@@ -13,14 +13,6 @@ juce_add_gui_app(${TargetName}
 target_sources(${TargetName} PRIVATE
         Main.cpp)
 
-if (APPLE)
-    target_sources(${TargetName} PRIVATE
-        Native/WakeListener.mm)
-else()
-    target_sources(${TargetName} PRIVATE
-        Native/WakeListener.cpp)
-endif ()
-
 set_default_app_config(${TargetName})
 
 target_link_libraries(${TargetName} PRIVATE
@@ -28,4 +20,5 @@ target_link_libraries(${TargetName} PRIVATE
         ea_midirouter_ui_utils
         juce_audio_utils
         ea_data_structures
-        JSON)
+        JSON
+        RTMIDI-Interface)

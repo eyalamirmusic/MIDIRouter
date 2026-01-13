@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonHeader.h"
+#include "RTMIDI/MIDIMessage.h"
 
 namespace MIDIRouterApp
 {
@@ -26,13 +27,13 @@ inline JSON toJSON(const MidiDeviceInfo& info)
 
 struct ConnectionDescription
 {
-    void connect(const MidiDeviceInfo& info)
+    void connect(const std::string& info)
     {
         if (!hasOutput(info))
             outputs.emplace_back(info);
     }
 
-    void toggle(const MidiDeviceInfo& info)
+    void toggle(const std::string& info)
     {
         if (hasOutput(info))
             disconnect(info);
@@ -40,13 +41,12 @@ struct ConnectionDescription
             connect(info);
     }
 
-    void disconnect(const MidiDeviceInfo& info)
+    void disconnect(const std::string& info)
     {
-        auto removed = std::ranges::remove(outputs, info).begin();
-        outputs.erase(removed);
+        outputs.removeAllMatches(info);
     }
 
-    bool hasOutput(const MidiDeviceInfo& info) const
+    bool hasOutput(const std::string& info) const
     {
         for (auto& output: outputs)
         {
@@ -60,27 +60,27 @@ struct ConnectionDescription
     JSON save() const
     {
         auto res = JSON();
-        res["input"] = toJSON(input);
+        res["input"] = input;
 
         auto& resOutputs = res["outputs"];
 
         for (auto& output: outputs)
-            resOutputs.emplace_back(toJSON(output));
+            resOutputs.emplace_back(output);
 
         return res;
     }
 
     void load(const JSON& json)
     {
-        input = fromJSON(json["input"]);
+        input = json["input"];
 
         outputs.clear();
 
         for (auto& output: json["outputs"])
-            outputs.emplace_back(fromJSON(output));
+            outputs.emplace_back(output);
     }
 
-    MidiDeviceInfo input;
-    Vector<MidiDeviceInfo> outputs;
+    std::string input;
+    Vector<std::string> outputs;
 };
 } // namespace MIDIRouterApp

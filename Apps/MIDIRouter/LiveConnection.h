@@ -1,14 +1,17 @@
 #pragma once
 
 #include "ConnectionDescription.h"
+#include "RTMIDI/Interface.h"
 
 namespace MIDIRouterApp
 {
 struct LiveConnection
 {
+    using ConnectionCB = std::function<void(const MIDI::Message&, LiveConnection&)>;
+
     bool isMatching(const ConnectionDescription& description) const
     {
-        if (input->getIdentifier() != description.input.identifier)
+        if (input->getName() != description.input)
             return false;
 
         if (description.outputs.size() != outputs.size())
@@ -16,8 +19,7 @@ struct LiveConnection
 
         for (int index = 0; index < description.outputs.size(); ++index)
         {
-            if (outputs[index]->getIdentifier()
-                != description.outputs[index].identifier)
+            if (outputs[index]->getName() != description.outputs[index])
                 return false;
         }
 
@@ -38,46 +40,47 @@ struct LiveConnection
         return true;
     }
 
-    OwningPointer<MidiInput> input = nullptr;
-    OwnedVector<MidiOutput> outputs;
+    OwningPointer<RTMIDI::InputPort> input;
+    OwnedVector<RTMIDI::OutputPort> outputs;
 };
+
+inline OwningPointer<RTMIDI::InputPort> createInputPort(const String& name,
+                                                        const MIDI::Callback& cb)
+{
+    auto portList = RTMIDI::getPortList();
+
+    if (auto port = RTMIDI::findFirstContains(portList.inputs, name.toStdString()))
+        return EA::makeOwned<RTMIDI::InputPort>(port, cb);
+
+    return nullptr;
+}
+
+inline OwningPointer<RTMIDI::OutputPort> createOutputPort(const String& name)
+{
+    auto portList = RTMIDI::getPortList();
+
+    if (auto port = RTMIDI::findFirstContains(portList.outputs, name.toStdString()))
+        return EA::makeOwned<RTMIDI::OutputPort>(port);
+
+    return nullptr;
+}
 
 inline OwningPointer<LiveConnection>
     createConnection(const ConnectionDescription& description,
-                     juce::MidiInputCallback& cb)
+                     const LiveConnection::ConnectionCB& cb)
 {
     auto newConnection = EA::makeOwned<LiveConnection>();
+    auto c = newConnection.get();
 
-    auto inputDevices = MidiInput::getAvailableDevices();
+    auto inputCB = [cb, c](const MIDI::Message& m)
+    { cb(m, *c); };
+    newConnection->input = createInputPort(description.input, inputCB);
 
-    for (auto& device: inputDevices)
-    {
-        if (device.identifier == description.input.identifier)
-        {
-            newConnection->input =
-                MidiInput::openDevice(description.input.identifier, &cb);
-        }
-    }
-
-    auto outputDevices = MidiOutput::getAvailableDevices();
-
-    for (auto output: description.outputs)
-    {
-        for (auto& device: outputDevices)
-        {
-            if (device.identifier == output.identifier)
-            {
-                newConnection->outputs.create(
-                    MidiOutput::openDevice(output.identifier));
-            }
-        }
-    }
+    for (auto& output: description.outputs)
+        newConnection->outputs.create(createOutputPort(output));
 
     if (newConnection->isValid())
-    {
-        newConnection->input->start();
         return newConnection;
-    }
 
     std::cout << "invalid connection\n";
 

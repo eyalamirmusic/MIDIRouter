@@ -2,13 +2,10 @@
 
 #include "State.h"
 #include "LiveConnection.h"
-#include "Native/WakeListener.h"
 
 namespace MIDIRouterApp
 {
-struct MIDIRouter
-    : juce::MidiInputCallback
-    , juce::Timer
+struct MIDIRouter : juce::Timer
 {
     MIDIRouter(State& stateToUse)
         : state(stateToUse)
@@ -42,16 +39,19 @@ struct MIDIRouter
 
         liveConnections.clear();
 
+        auto cb = [this](const MIDI::Message& m, const LiveConnection& connection)
+        {
+            auto localLock = EA::Locks::ScopedSpinLock(lock);
+
+            for (auto& output: connection.outputs)
+                output->send(m);
+        };
+
         for (auto& connection: state.connections)
         {
-            if (auto newConnection = createConnection(connection, *this))
+            if (auto newConnection = createConnection(connection, cb))
                 liveConnections.emplace_back(std::move(newConnection));
         }
-    }
-
-    void delayedRebuild()
-    {
-        juce::Timer::callAfterDelay(2000, [this] { rebuildConnections(); });
     }
 
     void update()
@@ -62,24 +62,8 @@ struct MIDIRouter
             rebuildConnections();
     }
 
-    void handleIncomingMidiMessage(MidiInput* input,
-                                   const juce::MidiMessage& message) override
-    {
-        auto sl = EA::Locks::ScopedSpinLock(lock);
-
-        for (auto& connection: liveConnections)
-        {
-            if (connection->input.get() == input)
-            {
-                for (auto& output: connection->outputs)
-                    output->sendMessageNow(message);
-            }
-        }
-    }
-
     State& state;
     EA::Locks::RecursiveSpinLock lock;
     OwnedVector<LiveConnection> liveConnections;
-    Native::WakeListener wake {[&] { delayedRebuild(); }};
 };
 } // namespace MIDIRouterApp

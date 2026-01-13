@@ -18,7 +18,7 @@ struct State
 
     ~State() { saveToFile(); }
 
-    void createConnection(const MidiDeviceInfo& inputID)
+    void createConnection(const std::string& inputID)
     {
         if (!hasConnection(inputID))
         {
@@ -84,11 +84,11 @@ struct State
         }
     }
 
-    bool hasConnection(const MidiDeviceInfo& inputID) const
+    bool hasConnection(const std::string& input) const
     {
         for (auto& connection: connections)
         {
-            if (connection.input == inputID)
+            if (connection.input == input)
                 return true;
         }
 

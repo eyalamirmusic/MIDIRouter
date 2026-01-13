@@ -4,6 +4,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <nlohmann/json.hpp>
 #include <ea_data_structures/ea_data_structures.h>
+#include "RTMIDI/Interface.h"
 
 namespace MIDIRouterApp
 {
